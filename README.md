@@ -145,19 +145,26 @@ Damit hast Du ein schlüssiges Vorgehen, um die Auswirkungen des Krieges in der 
 
 Links:
 
+
+
+Zeit: Russland schneidet Pokrowsk von wichtigen Straßen ab
+
 https://www.zeit.de/politik/ausland/karte-ukraine-krieg-russland-frontverlauf-truppenbewegungen
+
+
+Arc GIS story maps: Interactive Map: Ukraine's Incursion into Kursk Oblast
 
 https://storymaps.arcgis.com/stories/83a2f24901c941d581c0c523ecd2619b
 
 
 
-Erntezeit im Krieg: Den einen Bauern brennen die Felder ab, die anderen wissen nicht, wohin mit ihrem Korn
+NZZ: Erntezeit im Krieg: Den einen Bauern brennen die Felder ab, die anderen wissen nicht, wohin mit ihrem Korn
 
 From <https://www.nzz.ch/international/ukraine-der-krieg-zerstoert-felder-und-blockiert-getreide-export-ld.1695644> 
 
 
 
-Ukraine-Krieg: Hier bombardieren Russen ukrainische Weizen-Felder
+nau: Ukraine-Krieg: Hier bombardieren Russen ukrainische Weizen-Felder
 
 From <https://www.nau.ch/news/europa/ukraine-krieg-hier-bombardieren-russen-ukrainische-weizen-felder-66224734> 
 
