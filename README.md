@@ -169,3 +169,15 @@ nau: Ukraine-Krieg: Hier bombardieren Russen ukrainische Weizen-Felder
 From <https://www.nau.ch/news/europa/ukraine-krieg-hier-bombardieren-russen-ukrainische-weizen-felder-66224734> 
 
 
+Anmerkungen Rienow
+-yield expectation estimation
+-prxy indices
+-iu college?
+-wie haben sich die Werte im Buffer entwickelt?
+-ROI 
+-Gee in jupyter Notebook
+-bis nächster Woche: was zeigt der NDVI
+    -unterteilt evtl in N/S/E/W
+-mehr Datenpunkte al 12
+-Copernicus compare feature
+    -copernicus acc
