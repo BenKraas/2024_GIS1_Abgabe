@@ -12,3 +12,4 @@ dependencies:
   - oauthlib
   - requests-oauthlib
   - notebook
+  - contextily
