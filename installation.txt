@@ -1,0 +1,6 @@
+# Install geemap and geopandas
+conda create -n gee python=3.11
+conda activate gee
+conda install -n base mamba -c conda-forge
+mamba install geemap -c conda-forge
+mamba install geopandas localtileserver -c conda-forge
