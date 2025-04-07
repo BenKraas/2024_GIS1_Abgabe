@@ -1,0 +1,15 @@
+# environment yml for conda
+name: GIS1
+channels:
+  - conda-forge
+dependencies:
+  - ipykernel
+  - rasterio
+  - geopandas
+  - matplotlib
+  - earthaccess
+  - sentinelhub
+  - oauthlib
+  - requests-oauthlib
+  - notebook
+  - contextily
