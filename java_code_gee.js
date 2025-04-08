@@ -1,131 +1,123 @@
-// This script calculates monthly mean NDVI from 2020-2024,
-// clips the results to a user-defined focus region,
-// and exports the resulting rasters to Google Drive.
+// Google Earth Engine script to create monthly NDVI mean rasters for June (2020-2024)
 
-// ----------------- SETUP -----------------
-// Import the shapefile for the focus region
-// You will need to replace this with your actual asset path after uploading your shapefile
+// Define a region of interest (you'll need to replace this with your actual geometry)
+// For demonstration, I'll use a point and buffer it to create a region
+var geometry = focusRegion
 
-// Define the time range
-var startDate = '2020-01-01';
-var endDate = '2024-12-31';
-
-// ----------------- FUNCTIONS -----------------
-// Function to calculate NDVI from Sentinel-2 imagery
+// Function to calculate NDVI
 function addNDVI(image) {
   var ndvi = image.normalizedDifference(['B8', 'B4']).rename('NDVI');
   return image.addBands(ndvi);
 }
 
-// Function to mask clouds in Sentinel-2 images using the SCL band
-// (Scene Classification Layer)
-function maskS2clouds(image) {
-  var scl = image.select('SCL');
-  var mask = scl.gte(4).and(scl.lte(7));  // Keep vegetation, soil, water
-  return image.updateMask(mask);
+// Function to create monthly NDVI mean for a specific year and month
+function createMonthlyNDVI(year, month) {
+  // Set date range for the month
+  var startDate = ee.Date.fromYMD(year, month, 1);
+  var endDate = startDate.advance(1, 'month');
+  
+  // Get Sentinel-2 imagery for the time period
+  var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+    .filterDate(startDate, endDate)
+    .filterBounds(geometry)
+    .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20)); // Filter cloudy images
+  
+  // Calculate NDVI for each image
+  var withNDVI = s2.map(addNDVI);
+  
+  // Calculate the mean NDVI for the month
+  var ndviMean = withNDVI.select('NDVI').mean();
+  
+  // Add properties for identification
+  return ndviMean.clip(geometry).set({
+    'system:time_start': startDate.millis(),
+    'year': year,
+    'month': month,
+    'description': 'NDVI_Mean_' + year + '_' + month
+  });
 }
 
-// ----------------- DATA PREPARATION -----------------
-// Load Sentinel-2 Surface Reflectance collection
-var s2 = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-  .filterDate(startDate, endDate)
-  .filterBounds(focusRegion)
-  .map(maskS2clouds)
-  .map(addNDVI);
+// Create NDVI means for June of each year (2020-2024)
+var ndvi_2020_06 = createMonthlyNDVI(2020, 6);
+var ndvi_2021_06 = createMonthlyNDVI(2021, 6);
+var ndvi_2022_06 = createMonthlyNDVI(2022, 6);
+var ndvi_2023_06 = createMonthlyNDVI(2023, 6);
+var ndvi_2024_06 = createMonthlyNDVI(2024, 6);
 
-// Generate a list of months between start and end dates
-var startMonth = ee.Date(startDate);
-var endMonth = ee.Date(endDate);
-var months = ee.List.sequence(0, endMonth.difference(startMonth, 'month').round());
-
-print('Number of months:', months.size());
-
-// Display the focus region on the map
-Map.centerObject(focusRegion, 10);
-Map.addLayer(focusRegion, {color: 'red'}, 'Focus Region');
-
-// // Display one monthly NDVI composite for visualization
-// var sampleMonth = months.get(0);
-// var sampleStart = startMonth.advance(sampleMonth, 'month');
-// var sampleEnd = sampleStart.advance(1, 'month');
-// var sampleNDVI = s2.filterDate(sampleStart, sampleEnd)
-//   .select('NDVI')
-//   .mean()
-//   .clip(focusRegion);
-// Map.addLayer(sampleNDVI, {min: 0.0, max: 0.8, palette: ['FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', '99B718']}, 'Sample Monthly NDVI');
-
-// ----------------- MONTHLY COMPOSITES -----------------
-// Function to create monthly composites
-var createMonthlyComposite = function(monthOffset) {
-  var start = startMonth.advance(monthOffset, 'month');
-  var end = start.advance(1, 'month');
-  
-  // Filter the collection to the specific month and calculate the mean NDVI
-  var monthlyImgs = s2.filterDate(start, end);
-  var monthlyNDVIComposite = monthlyImgs.select('NDVI').mean();
-  
-  // Get year and month as strings for naming the export
-  var yearStr = start.get('year').format('%04d');
-  var monthStr = start.get('month').format('%02d');
-  
-  // Add properties for export naming
-  return monthlyNDVIComposite
-    .set('year', yearStr)
-    .set('month', monthStr)
-    .set('date', ee.String(yearStr).cat('_').cat(monthStr))
-    .clip(focusRegion);
-};
-
-// Create a list of monthly NDVI composites
-var monthlyNDVI = months.map(createMonthlyComposite);
-
-// ----------------- EXPORT -----------------
-// Function to export each monthly composite
-var exportMonthlyNDVI = function(image) {
-  var image_exp = ee.Image(image);
-  var dateStr = image_exp.get('date').getInfo();
-
-  print('Exporting NDVI for:', dateStr);
-  print('Image ID:', image_exp.id());
-
-  
-  // Export the image to Google Drive
-  Export.image.toDrive({
-    image: image_exp,
-    description: 'NDVI_' + dateStr,
-    folder: 'GEE_NDVI_Exports',
-    scale: 100,  // 100m resolution due to data limitations
-    region: focusRegion.geometry().bounds(),
-    maxPixels: 1e13,
-    fileFormat: 'GeoTIFF',
-    formatOptions: {
-      cloudOptimized: true
-    }
-  });
-  
-  return image_exp;
-};
-
-// Apply the export function to each monthly composite
-monthlyNDVI.map(exportMonthlyComposite);
-
-// ----------------- VISUALIZATION -----------------
-// For visualization purposes, show the latest monthly NDVI composite
-var latestNDVI = ee.Image(monthlyNDVI.get(monthlyNDVI.size().subtract(1)));
-var ndviVis = {
-  min: 0.0,
+// Visualization parameters for NDVI
+var ndviParams = {
+  min: -0.2,
   max: 0.8,
-  palette: [
-    'FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', '99B718',
-    '74A901', '66A000', '529400', '3E8601', '207401', '056201',
-    '004C00', '023B01', '012E01', '011D01', '011301'
-  ]
+  palette: ['FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', '99B718', '74A901', '66A000', '529400', '3E8601', '207401', '056201', '004C00', '023B01', '012E01', '011D01', '011301']
 };
 
-Map.centerObject(focusRegion, 10);
-Map.addLayer(latestNDVI, ndviVis, 'Latest Monthly NDVI');
-Map.addLayer(focusRegion, {color: 'red'}, 'Focus Region');
+// Display the NDVI means
+Map.centerObject(geometry, 10);
+Map.addLayer(ndvi_2020_06, ndviParams, 'NDVI June 2020');
+Map.addLayer(ndvi_2021_06, ndviParams, 'NDVI June 2021');
+Map.addLayer(ndvi_2022_06, ndviParams, 'NDVI June 2022');
+Map.addLayer(ndvi_2023_06, ndviParams, 'NDVI June 2023');
+Map.addLayer(ndvi_2024_06, ndviParams, 'NDVI June 2024');
 
-// Print information about the exports
-print('Total number of monthly exports:', monthlyNDVI.size());
+// Get projection information from one of the original images
+var sample = ee.Image(ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+  .filterBounds(geometry)
+  .first());
+var projection = sample.projection();
 
+// Export the NDVI means to assets
+// Export the NDVI means to Drive
+Export.image.toDrive({
+  image: ndvi_2020_06,
+  description: 'NDVI_Mean_2020_06',
+  folder: 'EarthEngineExports',
+  fileNamePrefix: 'NDVI_Mean_2020_06',
+  crs: 'EPSG:4326',
+  region: geometry,
+  maxPixels: 1e9,
+  scale: 10
+});
+
+Export.image.toDrive({
+  image: ndvi_2021_06,
+  description: 'NDVI_Mean_2021_06',
+  folder: 'EarthEngineExports',
+  fileNamePrefix: 'NDVI_Mean_2021_06',
+  crs: 'EPSG:4326',
+  region: geometry,
+  maxPixels: 1e9,
+  scale: 10
+});
+
+Export.image.toDrive({
+  image: ndvi_2022_06,
+  description: 'NDVI_Mean_2022_06',
+  folder: 'EarthEngineExports',
+  fileNamePrefix: 'NDVI_Mean_2022_06',
+  crs: 'EPSG:4326',
+  region: geometry,
+  maxPixels: 1e9,
+  scale: 10
+});
+
+Export.image.toDrive({
+  image: ndvi_2023_06,
+  description: 'NDVI_Mean_2023_06',
+  folder: 'EarthEngineExports',
+  fileNamePrefix: 'NDVI_Mean_2023_06',
+  crs: 'EPSG:4326',
+  region: geometry,
+  maxPixels: 1e9,
+  scale: 10
+});
+
+Export.image.toDrive({
+  image: ndvi_2024_06,
+  description: 'NDVI_Mean_2024_06',
+  folder: 'EarthEngineExports',
+  fileNamePrefix: 'NDVI_Mean_2024_06',
+  crs: 'EPSG:4326',
+  region: geometry,
+  maxPixels: 1e9,
+  scale: 10
+});
