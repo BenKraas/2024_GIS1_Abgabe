@@ -37,12 +37,14 @@ function createMonthlyNDVI(year, month) {
   });
 }
 
-// Create NDVI means for June of each year (2020-2024)
-var ndvi_2020_06 = createMonthlyNDVI(2020, 6);
-var ndvi_2021_06 = createMonthlyNDVI(2021, 6);
-var ndvi_2022_06 = createMonthlyNDVI(2022, 6);
-var ndvi_2023_06 = createMonthlyNDVI(2023, 6);
-var ndvi_2024_06 = createMonthlyNDVI(2024, 6);
+// Create NDVI means for June and December of each year (2020-2024)
+var ndviMeans = {};
+[2020, 2021, 2022, 2023, 2024].forEach(function(year) {
+  [3, 6, 9, 12].forEach(function(month) {
+    var key = 'ndvi_' + year + '_' + (month < 10 ? '0' + month : month);
+    ndviMeans[key] = createMonthlyNDVI(year, month);
+  });
+});
 
 // Visualization parameters for NDVI
 var ndviParams = {
@@ -51,13 +53,13 @@ var ndviParams = {
   palette: ['FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', '99B718', '74A901', '66A000', '529400', '3E8601', '207401', '056201', '004C00', '023B01', '012E01', '011D01', '011301']
 };
 
-// Display the NDVI means
-Map.centerObject(geometry, 10);
-Map.addLayer(ndvi_2020_06, ndviParams, 'NDVI June 2020');
-Map.addLayer(ndvi_2021_06, ndviParams, 'NDVI June 2021');
-Map.addLayer(ndvi_2022_06, ndviParams, 'NDVI June 2022');
-Map.addLayer(ndvi_2023_06, ndviParams, 'NDVI June 2023');
-Map.addLayer(ndvi_2024_06, ndviParams, 'NDVI June 2024');
+// Display the NDVI means (should be disabled for better performance)
+// Map.centerObject(geometry, 10);
+// // addLayer for each NDVI mean
+// Object.keys(ndviMeans).forEach(function(key) {
+//   var ndviImage = ndviMeans[key];
+//   Map.addLayer(ndviImage, ndviParams, key);
+// });
 
 // Get projection information from one of the original images
 var sample = ee.Image(ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
@@ -65,59 +67,22 @@ var sample = ee.Image(ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
   .first());
 var projection = sample.projection();
 
-// Export the NDVI means to assets
-// Export the NDVI means to Drive
-Export.image.toDrive({
-  image: ndvi_2020_06,
-  description: 'NDVI_Mean_2020_06',
-  folder: 'EarthEngineExports',
-  fileNamePrefix: 'NDVI_Mean_2020_06',
-  crs: 'EPSG:4326',
-  region: geometry,
-  maxPixels: 1e9,
-  scale: 10
+// Iterate over the keys and export each NDVI mean image to Google Drive
+// Note: This will create a folder named 'EarthEngineExports_NDVI' in your Google Drive
+
+var resolution = 100; // Set the resolution to 100 meters
+
+Object.keys(ndviMeans).forEach(function(key) {
+  Export.image.toDrive({
+    image: ndviMeans[key],
+    description: key,
+    folder: 'EarthEngineExports_NDVI',
+    fileNamePrefix: key,
+    region: geometry,
+    maxPixels: 1e9,
+    scale: resolution,
+  });
 });
 
-Export.image.toDrive({
-  image: ndvi_2021_06,
-  description: 'NDVI_Mean_2021_06',
-  folder: 'EarthEngineExports',
-  fileNamePrefix: 'NDVI_Mean_2021_06',
-  crs: 'EPSG:4326',
-  region: geometry,
-  maxPixels: 1e9,
-  scale: 10
-});
-
-Export.image.toDrive({
-  image: ndvi_2022_06,
-  description: 'NDVI_Mean_2022_06',
-  folder: 'EarthEngineExports',
-  fileNamePrefix: 'NDVI_Mean_2022_06',
-  crs: 'EPSG:4326',
-  region: geometry,
-  maxPixels: 1e9,
-  scale: 10
-});
-
-Export.image.toDrive({
-  image: ndvi_2023_06,
-  description: 'NDVI_Mean_2023_06',
-  folder: 'EarthEngineExports',
-  fileNamePrefix: 'NDVI_Mean_2023_06',
-  crs: 'EPSG:4326',
-  region: geometry,
-  maxPixels: 1e9,
-  scale: 10
-});
-
-Export.image.toDrive({
-  image: ndvi_2024_06,
-  description: 'NDVI_Mean_2024_06',
-  folder: 'EarthEngineExports',
-  fileNamePrefix: 'NDVI_Mean_2024_06',
-  crs: 'EPSG:4326',
-  region: geometry,
-  maxPixels: 1e9,
-  scale: 10
-});
+// Unfortunately, Google Earth Engine does not allow programmatic starting of export tasks from JavaScript in the Code Editor. 
+// All export tasks must be manually started by the user.
