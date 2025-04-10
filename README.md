@@ -24,9 +24,9 @@ a) Ziel:
    - Kartografisch aufbereitetete ergebnisseund Darstellung als ArcGIS StoryMap
 b) Fragestellungen konkretisieren:  
    - Wie hat sich die Weizenanbaufläche bzw. -ernte vor und nach Kriegsbeginn verändert?  
-   - Welche Regionen sind besonders stark betroffen?  
-   - Gibt es Änderungen in den Produktionsmengen oder Export-Routen?  
-   - Welche zusätzlichen Faktoren (z. B. Bodendaten, NDVI-Satellitenindices, Wetterdaten) können die Entwicklung erklären oder beeinflussen?
+   - Welche Regionen betroffen?  
+   - Änderungen in den Produktionsmengen oder Export-Routen?  
+   - Welche zusätzlichen Faktoren (z. B. Bodendaten, NDVI-Satellitenindices, Wetterdaten) 
 C) Welche Daten?
    - Statistische Weizenproduktionsdaten aus offiziellen Quellen (z. B. FAO, USDA, Statistiken des ukrainischen Landwirtschaftsministeriums, internationale Handelsdaten)
    - Geodaten der Ukraine (Grenzen, Verwaltungsbezirke, landwirtschaftliche Nutzflächen)   
