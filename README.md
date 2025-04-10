@@ -1,23 +1,6 @@
 # 2024_GIS1_Abgabe
 Codebase der Abgabeleistung für GIS1
 
-Weizen Ukraine 
-- Region (Luhansk?) 
-- Wie beeinflusst der Krieg die Weizenproduktion in der umkämpften Region 
-    - Ggfs. Ganze Ukraine 
-- NDVI Maps 
-- Copernicus (aktuelle Aufnahmen vorhanden) 
-- Shape files der Front 
-    - Grobe Linie 
-    - Hypothetisch 
-- Deltakarte 
-    - Monatliche / Jährlich 
-    - Mittelwertvergleiche 
-- Pufferzone in der Frontzone 
-- Gibt es noch einen Index, der Weizen besser darstellt? 
-- Faktoren 
-    - Jahreszeiten, Klima
-
 1. Projektziel und Konzeption
 a) Ziel:  
    - (Geo-)Statistische und visuelle Darstellung, wie sich der Krieg in der Ukraine auf die Weizenproduktion auswirkt  
@@ -78,7 +61,7 @@ d) Gestaltung & Story:
    - Story, Aufbau, Ziele
    - Abgabe vorbereiten
 
-Links:
+# Links:
 Zeit: Russland schneidet Pokrowsk von wichtigen Straßen ab
 https://www.zeit.de/politik/ausland/karte-ukraine-krieg-russland-frontverlauf-truppenbewegungen
 
@@ -90,6 +73,25 @@ From <https://www.nzz.ch/international/ukraine-der-krieg-zerstoert-felder-und-bl
 
 nau: Ukraine-Krieg: Hier bombardieren Russen ukrainische Weizen-Felder
 From <https://www.nau.ch/news/europa/ukraine-krieg-hier-bombardieren-russen-ukrainische-weizen-felder-66224734> 
+
+
+# Notizen
+Weizen Ukraine 
+- Region (Luhansk?) 
+- Wie beeinflusst der Krieg die Weizenproduktion in der umkämpften Region 
+    - Ggfs. Ganze Ukraine 
+- NDVI Maps 
+- Copernicus (aktuelle Aufnahmen vorhanden) 
+- Shape files der Front 
+    - Grobe Linie 
+    - Hypothetisch 
+- Deltakarte 
+    - Monatliche / Jährlich 
+    - Mittelwertvergleiche 
+- Pufferzone in der Frontzone 
+- Gibt es noch einen Index, der Weizen besser darstellt? 
+- Faktoren 
+    - Jahreszeiten, Klima
 
 Anmerkungen Rienow
 -yield expectation estimation
